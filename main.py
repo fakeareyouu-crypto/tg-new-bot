@@ -93,11 +93,12 @@ def safe_send_message(chat_id: int, text: str) -> None:
 def handle_start(message: telebot.types.Message) -> None:
     """Handle /start command."""
     welcome_text = (
-        "👋 <b>Welcome to the Contact Bot</b>\n\n"
-        "Use this bot to send a message directly to the admin.\n"
-        "Commands:\n"
-        "• /contact - Send your message to the admin\n"
-        "• /help - Show help instructions"
+        "👋 <b>Welcome!</b>\n\n"
+        "This is the official contact bot for admin support.\n"
+        "Share your concern anytime and it will be forwarded directly.\n\n"
+        "<b>Available commands</b>\n"
+        "• /contact — Send a message to the admin\n"
+        "• /help — View quick usage instructions"
     )
     safe_send_message(message.chat.id, welcome_text)
 
@@ -106,12 +107,11 @@ def handle_start(message: telebot.types.Message) -> None:
 def handle_help(message: telebot.types.Message) -> None:
     """Handle /help command."""
     help_text = (
-        "ℹ️ <b>Help</b>\n\n"
-        "This bot forwards your message to the admin.\n"
-        "How to use:\n"
+        "ℹ️ <b>How this bot works</b>\n\n"
         "1) Send /contact\n"
-        "2) Type your message in your next text message\n\n"
-        "Your message will be logged and forwarded."
+        "2) Type your message in chat\n"
+        "3) We forward it to the admin instantly\n\n"
+        "You will receive a confirmation after delivery."
     )
     safe_send_message(message.chat.id, help_text)
 
@@ -119,7 +119,7 @@ def handle_help(message: telebot.types.Message) -> None:
 @bot.message_handler(commands=["contact"])
 def handle_contact(message: telebot.types.Message) -> None:
     """Handle /contact command."""
-    prompt = "✉️ Please send the message you want to deliver to the admin."
+    prompt = "✉️ Please type the message you want to send to the admin."
     safe_send_message(message.chat.id, prompt)
 
 
@@ -144,7 +144,7 @@ def handle_user_message(message: telebot.types.Message) -> None:
     safe_send_message(ADMIN_ID, forward_text)
     safe_send_message(
         message.chat.id,
-        "Your message has been sent to the admin. You will be contacted if necessary.",
+        "✅ Your message has been sent to the admin. You will be contacted if necessary.",
     )
 
 

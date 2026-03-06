@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Telegram Bot Logs Dashboard</title>
+    <title>Telegram Contact Bot Dashboard</title>
     <style>
       :root {
         color-scheme: dark;
@@ -63,10 +63,10 @@
   </head>
   <body>
     <main class="container">
-      <h1>Telegram Bot Logs Dashboard</h1>
-      <p class="subtitle">Live Message Logs</p>
-      <section id="logs" class="log-box">Loading logs...</section>
-      <p id="status" class="status">Refreshing every 5 seconds...</p>
+      <h1>Telegram Contact Bot Dashboard</h1>
+      <p class="subtitle">Live Support Message Logs</p>
+      <section id="logs" class="log-box">Loading latest logs...</section>
+      <p id="status" class="status">Auto-refresh is active (every 5 seconds).</p>
     </main>
 
     <script>
@@ -81,11 +81,11 @@
           }
 
           const data = await response.json();
-          logsElement.textContent = data.logs || "No logs yet.";
-          statusElement.textContent = `Last refreshed: ${new Date().toLocaleTimeString()} (auto-refresh every 5 seconds)`;
+          logsElement.textContent = data.logs || "No messages logged yet.";
+          statusElement.textContent = `Last sync: ${new Date().toLocaleTimeString()} · Refresh interval: 5s`;
           logsElement.scrollTop = logsElement.scrollHeight;
         } catch (error) {
-          statusElement.textContent = `Failed to refresh logs: ${error.message}`;
+          statusElement.textContent = `Unable to refresh logs right now: ${error.message}`;
         }
       }
 
