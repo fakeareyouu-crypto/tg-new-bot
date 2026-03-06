@@ -5,7 +5,11 @@
       "dest": "/api/bot.py"
     },
     {
-      "src": "/(.*)",
+      "src": "/setwebhook",
+      "dest": "/api/bot.py"
+    },
+    {
+      "src": "/",
       "dest": "/api/bot.py"
     }
   ]
