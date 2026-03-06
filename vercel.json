@@ -1,0 +1,12 @@
+{
+  "routes": [
+    {
+      "src": "/",
+      "dest": "/api/bot.py"
+    },
+    {
+      "src": "/webhook",
+      "dest": "/api/bot.py"
+    }
+  ]
+}
