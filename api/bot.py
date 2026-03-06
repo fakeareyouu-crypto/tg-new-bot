@@ -1,21 +1,28 @@
 import os
 import telebot
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template_string
 from datetime import datetime
 
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
-ADMIN_ID = int(os.environ.get("ADMIN_ID"))
+ADMIN_ID = os.environ.get("ADMIN_ID")
+
+if not BOT_TOKEN or not ADMIN_ID:
+    raise Exception("Missing BOT_TOKEN or ADMIN_ID")
+
+ADMIN_ID = int(ADMIN_ID)
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
-app = Flask(__name__, template_folder="../templates")
+app = Flask(__name__)
 
-LOG_FILE = "logs.txt"
+LOG_FILE = "/tmp/logs.txt"
 
 
 def log_message(user, message):
     time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    log = f"[{time}] {user.username} ({user.id}): {message}\n"
+    username = user.username if user.username else "NoUsername"
+
+    log = f"[{time}] {username} ({user.id}): {message}\n"
 
     with open(LOG_FILE, "a", encoding="utf-8") as f:
         f.write(log)
@@ -23,20 +30,7 @@ def log_message(user, message):
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.reply_to(
-        message,
-        "👋 Welcome!\n\nThis is a contact bot.\nSend your message and it will reach the admin."
-    )
-
-
-@bot.message_handler(commands=['help'])
-def help_cmd(message):
-    bot.reply_to(
-        message,
-        "/start - Start bot\n"
-        "/help - Show help\n\n"
-        "Just send any message to contact the admin."
-    )
+    bot.reply_to(message, "👋 Welcome! Send a message to contact the admin.")
 
 
 @bot.message_handler(func=lambda m: True)
@@ -48,7 +42,7 @@ def contact_admin(message):
     log_message(user, text)
 
     admin_msg = f"""
-📩 New Contact Message
+📩 New Message
 
 User: @{user.username}
 ID: {user.id}
@@ -71,7 +65,23 @@ def index():
         with open(LOG_FILE, "r", encoding="utf-8") as f:
             logs = f.read()
 
-    return render_template("index.html", logs=logs)
+    html = f"""
+    <html>
+    <head>
+    <title>Bot Logs</title>
+    <style>
+    body{{background:#0f172a;color:#00ff9c;font-family:monospace;padding:30px}}
+    .box{{background:#020617;padding:20px;border-radius:10px;height:80vh;overflow:auto}}
+    </style>
+    </head>
+    <body>
+    <h1>Telegram Bot Logs</h1>
+    <div class="box"><pre>{logs}</pre></div>
+    </body>
+    </html>
+    """
+
+    return html
 
 
 @app.route("/webhook", methods=["POST"])
@@ -81,13 +91,16 @@ def webhook():
     update = telebot.types.Update.de_json(json_str)
     bot.process_new_updates([update])
 
-    return "OK", 200
+    return "OK"
 
 
 @app.route("/setwebhook")
 def set_webhook():
 
     url = os.environ.get("VERCEL_URL")
+
+    if not url:
+        return "VERCEL_URL not set"
 
     webhook_url = f"https://{url}/webhook"
 
