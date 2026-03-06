@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Telegram Contact Bot Dashboard</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+
+      body {
+        margin: 0;
+        padding: 1.5rem;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        background: #0f1117;
+        color: #e6edf3;
+      }
+
+      .container {
+        max-width: 960px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        margin-bottom: 0.35rem;
+      }
+
+      .subtitle {
+        color: #8b949e;
+        margin-bottom: 1rem;
+      }
+
+      .log-box {
+        background: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 12px;
+        padding: 1rem;
+        min-height: 350px;
+        max-height: 70vh;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        line-height: 1.45;
+      }
+
+      .status {
+        margin-top: 0.75rem;
+        color: #8b949e;
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 640px) {
+        body {
+          padding: 1rem;
+        }
+
+        h1 {
+          font-size: 1.3rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <h1>Telegram Contact Bot Dashboard</h1>
+      <p class="subtitle">Live Support Message Logs</p>
+      <section id="logs" class="log-box">Loading latest logs...</section>
+      <p id="status" class="status">Auto-refresh is active (every 5 seconds).</p>
+    </main>
+
+    <script>
+      const logsElement = document.getElementById("logs");
+      const statusElement = document.getElementById("status");
+
+      async function fetchLogs() {
+        try {
+          const response = await fetch("/api/logs", { cache: "no-store" });
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const data = await response.json();
+          logsElement.textContent = data.logs || "No messages logged yet.";
+          statusElement.textContent = `Last sync: ${new Date().toLocaleTimeString()} · Refresh interval: 5s`;
+          logsElement.scrollTop = logsElement.scrollHeight;
+        } catch (error) {
+          statusElement.textContent = `Unable to refresh logs right now: ${error.message}`;
+        }
+      }
+
+      fetchLogs();
+      setInterval(fetchLogs, 5000);
+    </script>
+  </body>
+</html>
